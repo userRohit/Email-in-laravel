@@ -1,0 +1,1 @@
+<?php echo e($passcode); ?><?php /**PATH /var/www/html/tpsspl/task2/resources/views/demomail.blade.php ENDPATH**/ ?>
