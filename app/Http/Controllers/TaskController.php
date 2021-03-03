@@ -3,6 +3,7 @@ namespace App\Http\Controllers;
 use App\task;
 use Illuminate\Http\Request;
 use DB;
+use Illuminate\Support\Facades\Validator;
 /*use App\task2;*/
 use Illuminate\Support\Facades\Mail;
 use App\Mail\sendmail;
@@ -36,7 +37,37 @@ class TaskController extends Controller
     {
         $data = $request->all(); // This will get all the request data.
         $passcode = mt_rand(10000, 99999);
-        if (task::where('email', '=', $request->get('email'))
+
+
+            $validator = Validator::make($request->all(), [
+            'email' => 'required|email',
+                            ]);
+
+                    if($validator->fails()){
+
+
+                if (task::where('passcode', '=', $request->get('email'))
+            ->exists())
+        {
+            return redirect()
+                ->route('new')
+                ->with('info', 'passcode added sucessfully');
+        }
+
+                    
+
+          else
+                    {
+            return redirect()
+                ->route('new')
+                ->with('info', 'Passcode not correct');
+                          }
+                    }
+                
+
+                    else
+                    {
+                        if (task::where('email', '=', $request->get('email'))
             ->exists())
         {
             task::where('email', $request->email)
@@ -53,17 +84,11 @@ class TaskController extends Controller
                 ->route('new')
                 ->with('info', 'email update  sucessfully');
         }
-        elseif (task::where('passcode', '=', $request->get('email'))
-            ->exists())
+       
+        else /*(task::where('email', '!=', $request->get('email'))
+            ->exists())*/
         {
-            return redirect()
-                ->route('new')
-                ->with('info', 'passcode added sucessfully');
-        }
-        elseif (task::where('email', '!=', $request->get('email'))
-            ->exists())
-        {
-            $this->validate($request, ['email' => 'required|email']);
+            
             $passcode = mt_rand(10000, 99999);
             $crud = new task;
             $crud->email = $request->email;
@@ -82,13 +107,12 @@ class TaskController extends Controller
                 ->route('new')
                 ->with('info', 'email insert');
         }
-        else
-        {
-            return redirect()
-                ->route('new')
-                ->with('info', 'Passcode not  added sucessfully');
-        }
+       
+
+
+        
     }
+}
     /**
      * Display the specified resource.
      *
